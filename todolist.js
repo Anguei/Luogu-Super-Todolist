@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         洛谷超级任务计划（第三方）
 // @namespace    http://tampermonkey.net/
-// @version      1.5
+// @version      1.6
 // @description  洛谷超级任务计划（第三方），不限题目数量
 // @author       Anguei, Legendword
 // @match        https://www.luogu.org/problemnew/show/*
@@ -20,7 +20,7 @@
 // 感谢 @memset0, @Legendword 帮助找 bug
 
 
-var version = '1.5';
+var version = '1.6';
 var originalLimit = 28;
 var nowUrl = window.location.href;
 var LuoguSuperTodolist = {
@@ -154,13 +154,13 @@ function updateMainPageList() {
 
     // 在 Luogu 官方任务计划后面添加第三方计划
     var problems = GM_getValue('problems')
-    $("h2:contains('智能推荐')").before('<h2>任务计划</h2>');
+    $("h2:contains('智能推荐')").before('<h2>任务计划<button class="am-btn am-btn-sm am-btn-primary lg-right" id="LuoguSuperTodolist-export">导出</button></h2>');
     for (var i in problems) {
         var state = getState(i);
         var color = { 'Y': 'green', 'N': 'black', '?': 'orange' };
         var content = { 'Y': '<i class="am-icon-check"></i>', 'N': '<i class="am-icon-minus"></i>', '?': '？' };
         $("h2:contains('智能推荐')").before(
-            '<div class="tasklist-item" data-pid="'
+            '<div class="tasklist-item LuoguSuperTodolist-tasklist-item" data-pid="'
             + i
             + '"><div><a href="/recordnew/lists?uid='
             + myUid
@@ -179,6 +179,36 @@ function updateMainPageList() {
             + '</a></div></div>'
         );
     }
+    $("#LuoguSuperTodolist-export").click(function(){
+        if (LuoguSuperTodolist.exportOpen) {
+            $("#LuoguSuperTodolist-export").html("导出");
+            $("#LuoguSuperTodolist-exportRes").remove();
+            LuoguSuperTodolist.exportOpen = false;
+            return;
+        }
+        else {
+            LuoguSuperTodolist.exportOpen = true;
+        }
+        // 导出列表
+        var listString = generateExportedList();
+        $("h2:contains('任务计划')").after(
+            "<div id='LuoguSuperTodolist-exportRes'>将以下文本复制到todo.list文件，即可用于memset0的Todolist"
+            + "<div class='am-form-group am-form'><textarea>"
+            + listString
+            + "</textarea></div>"
+        );
+        console.log(listString);
+        $("#LuoguSuperTodolist-export").html("完成");
+
+        function generateExportedList() {
+            var problems = LuoguSuperTodolist.problems;
+            var ex = "";
+            for (var c in problems) {
+                ex += "\n"+c+" # "+problems[c];
+            }
+            return ex;
+        }
+    });
 
     function getState(pid) {
         if (binarySearch(pid, myAc)) return 'Y';

@@ -21,6 +21,11 @@
 var runTime = GM_getValue('runTime');
 // console.log(runTime);
 var nowUrl = window.location.href;
+var LuoguSuperTodolist = {
+    settings: {
+        keepOriginalList: false
+    }
+};
 
 
 function updateRunTime(s = '') {
@@ -41,7 +46,9 @@ function syncList() {
     if (xhr.status == 200) {
         console.log('get original todo list: 200');
         var problems = extractData(xhr.responseText);
-        initList(problems);
+        LuoguSuperTodolist.problems = problems;
+        initList();
+        updateMainPageList();
     } else {
         return [];
     }
@@ -74,14 +81,21 @@ function syncList() {
         }
     }
 
-    function initList(problems) {
-        GM_setValue('problems', problems);
+    function initList() {
+        GM_setValue('problems', LuoguSuperTodolist.problems);
+    }
+}
 
-        //在Luogu官方任务计划后面添加第三方计划
-        $("h2:contains('智能推荐')").before('<h2>任务计划扩展</h2>');
-        for (var i in problems) {
-            $("h2:contains('智能推荐')").before('<div class="tasklist-item"><div><a class="colored" style="padding-left: 3px" href="/problemnew/show/'+i+'" target="_blank"><b>'+i+'</b> '+problems[i]+'</a></div></div>');
-        }
+function updateMainPageList() {
+    //清除官方的任务计划
+    if (!LuoguSuperTodolist.settings.keepOriginalList) {
+        $("h2:contains('智能推荐')").prevAll().remove();
+    }
+    //在Luogu官方任务计划后面添加第三方计划
+    var problems = LuoguSuperTodolist.problems;
+    $("h2:contains('智能推荐')").before('<h2>任务计划</h2>');
+    for (var i in problems) {
+        $("h2:contains('智能推荐')").before('<div class="tasklist-item"><div><a class="colored" style="padding-left: 3px" href="/problemnew/show/'+i+'" target="_blank"><b>'+i+'</b> '+problems[i]+'</a></div></div>');
     }
 }
 
@@ -157,7 +171,7 @@ function start() {
             // updateRunTime('first'); // 为了方便调试，暂时关掉了
             syncList();
         } else {
-            updateList(); // 不是首次运行，更新 todolist
+            updateMainPageList(); // 不是首次运行，更新 todolist
         }
     } else if (nowUrl.match(/problem/) != null) { // 题目页面运行脚本，更新题目分数、添加按钮
         addButton();

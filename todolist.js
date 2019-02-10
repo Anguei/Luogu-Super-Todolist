@@ -222,6 +222,7 @@ function addButton() {
 
     function isInList() {
         var nowList = GM_getValue('problems');
+        if (nowList == undefined) return false;
         return nowList[problemId] != undefined;
     }
 

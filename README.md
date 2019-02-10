@@ -40,6 +40,6 @@
 
 ## 鸣谢
 
-@memset0 提供创意
-@Legendword 协助 jQuery 部分代码
-@memeset0, @Legendword 找出 bug
+- @memset0 提供创意
+- @Legendword 协助 jQuery 部分代码
+- @memeset0, @Legendword 找出 bug

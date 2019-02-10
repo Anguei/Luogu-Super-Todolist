@@ -15,7 +15,6 @@
 // 1. 当 todolist 的 size 小于 30 时，顺便加入洛谷官方 todolist
 // 2. 在 res[pId] 中保存加入 todolist 的时间、该题的题目得分（用字典套数组实现）
 // 3. 发布脚本时，不要忘记去掉 updateRuntime('first') 的注释
-// 4. 如果显示分数的开销太高 / 太困难，可以考虑改为「通过 / 尝试过 / 未做」
 
 
 var runTime = GM_getValue('runTime');
@@ -85,13 +84,15 @@ function addButton() {
         .append('<p>'
             + '<a href="javascript: ;" '
             + 'id="addToSuperList" '
-            + 'target="_blank" class="am-btn am-btn-sm am-btn-primary">'
+            + 'class="am-btn am-btn-sm am-btn-primary">'
             + '添加至超级任务计划'
             + '</a>'
             + '</p>');
     $("#addToSuperList").click(addToList);
 
-    function addToList() {
+    function addToList(ev) {
+        $("#addToSuperList").attr("class","am-btn am-btn-sm am-btn-danger");
+        $("#addToSuperList").html("从任务计划移除");
     }
 }
 

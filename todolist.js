@@ -76,6 +76,12 @@ function syncList() {
 
     function initList(problems) {
         GM_setValue('problems', problems);
+
+        //在Luogu官方任务计划后面添加第三方计划
+        $("h2:contains('智能推荐')").before('<h2>任务计划扩展</h2>');
+        for (var i in problems) {
+            $("h2:contains('智能推荐')").before('<div class="tasklist-item"><div><a class="colored" style="padding-left: 3px" href="/problemnew/show/'+i+'" target="_blank"><b>'+i+'</b> '+problems[i]+'</a></div></div>');
+        }
     }
 }
 

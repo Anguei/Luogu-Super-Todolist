@@ -120,12 +120,12 @@ function addButton() {
     function swapState(ev) { // 是不是应该改成检测现在的属性，然后交换属性
         if (isInList()) { // 已经在任务计划列表，删掉它。变成蓝色按钮
             removeFromList(problemId, problemTitle);
-            $("#addToSuperList").attr("class", "am-btn am-btn-sm am-btn-primary");
-            $("#addToSuperList").html("添加至超级任务计划");
+            $("#update-todolist").attr("class", "am-btn am-btn-sm am-btn-primary");
+            $("#update-todolist").html("添加至超级任务计划");
         } else { // 不在任务计划当中，加进去，变成红色按钮
             addToList(problemId, problemTitle)
-            $("#addToSuperList").attr("class", "am-btn am-btn-sm am-btn-danger");
-            $("#addToSuperList").html("从任务计划移除");
+            $("#update-todolist").attr("class", "am-btn am-btn-sm am-btn-danger");
+            $("#update-todolist").html("从任务计划移除");
         }
 
         function addToList(id, title) {

@@ -30,7 +30,7 @@ var LuoguSuperTodolist = {
         keepOriginalList: false
     }
 };
-var myUid = document.cookie.match(/[0-9]+/)[0];
+var myUid = document.cookie.match(/_uid=[0-9]+/)[0].substr(5);
 console.log(myUid)
 console.log('如果上面获取到的 uid 不正确，请反馈作者，谢谢')
 

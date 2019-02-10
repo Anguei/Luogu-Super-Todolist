@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         洛谷超级任务计划（第三方）
 // @namespace    http://tampermonkey.net/
-// @version      1.1
+// @version      1.2
 // @description  洛谷超级任务计划（第三方），不限题目数量
 // @author       Anguei, Legendword
 // @match        https://www.luogu.org/problemnew/show/*
@@ -22,26 +22,16 @@
 // 感谢 @memset0, @Legendword 帮助找 bug
 
 
-var runTime = GM_getValue('runTime');
+var version = '1.2'
 var nowUrl = window.location.href;
 var LuoguSuperTodolist = {
     settings: {
         keepOriginalList: false
     }
 };
-var myUid = document.cookie.substr(5);
+var myUid = document.cookie.match(/[0-9]+/)[0];
 console.log(myUid)
 console.log('如果上面获取到的 uid 不正确，请反馈作者，谢谢')
-
-
-function updateRunTime(s = '') {
-    if (s == 'first') {
-        runTime = 1;
-    } else {
-        runTime++; // 好像没啥用
-    }
-    GM_setValue('runTime', runTime);
-}
 
 
 function syncList() {
@@ -61,7 +51,7 @@ function syncList() {
     function extractData(content) {
         var psid = content.split('" target="_blank"><b>');
         var problems = clearData(psid);
-        console.log(problems);
+        // console.log(problems);
         return problems;
 
         function clearData(psid) { // psid: problems' id
@@ -86,6 +76,12 @@ function syncList() {
     }
 
     function initList() {
+        var old = GM_getValue('problems');
+        if (old != undefined || old != 'undefined') {
+            for (var i in old) {
+                LuoguSuperTodolist.problems[i] = old[i]
+            }
+        }
         GM_setValue('problems', LuoguSuperTodolist.problems);
     }
 }
@@ -259,9 +255,9 @@ function addButton() {
 
 
 function start() {
-    if (runTime == undefined) { // 首次运行脚本，将原任务计划保存
-        console.log('首次运行脚本，请耐心等待初始化');
-        updateRunTime('first');
+    var lastVersion = GM_getValue('version');
+    if (lastVersion != version) { // 首次运行脚本，将原任务计划保存
+        console.log('更新后首次运行脚本，请耐心等待初始化');
         syncList();
     }
     if (nowUrl == 'https://www.luogu.org/') {
@@ -269,6 +265,7 @@ function start() {
     } else if (nowUrl.match(/problem/) != null) { // 题目页面运行脚本，添加按钮
         addButton();
     }
+    GM_setValue('version', version);
 }
 
 

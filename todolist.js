@@ -13,9 +13,7 @@
 
 // 可能将要实现的功能：
 // 1. 添加首页的编辑题目按钮
-// 2. 当 todolist 的 size 小于 30 时，新加入 superTodolist 的题目同步加入洛谷官方 todolist
-// 3. 从 superTodolist 删除题目时，若题目也在洛谷官方 todolist 当中，同步删除
-// 4. superTodolist 的导入与导出（以便于与 memset0 的项目配合，以及换电脑之后 superTodolist 的同步）
+// 2. superTodolist 的导入与导出（以便于与 memset0 的项目配合，以及换电脑之后 superTodolist 的同步）
 
 // 感谢 @memset0 提供创意
 // 感谢 @Legendword 协助完成 jQuery 相关代码
@@ -55,6 +53,7 @@ function getOriginalList() {
         return clearData(psid);
 
         function clearData(psid) { // psid: problems' id
+            if (psid[0].match(/智能推荐/) != null) break;
             var res = {}
             for (var i = 1; i < psid.length; i++) { // 从 1 开始循环，因为 split 导致 psid[0] 是垃圾文本串
                 var pId = '', pName = '', j = 0;

@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         洛谷超级任务计划（第三方）
-// @namespace    http://tampermonkey.net/
+// @namespace    https://github.com/Anguei/Luogu-Super-Todolist
 // @version      1.0
 // @description  洛谷超级任务计划（第三方），不限题目数量
 // @author       Anguei, Legendword

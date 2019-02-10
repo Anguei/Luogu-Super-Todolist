@@ -47,10 +47,9 @@ function syncList() {
         console.log('get original todo list: 200');
         var problems = extractData(xhr.responseText);
         LuoguSuperTodolist.problems = problems;
-        initList();
-        updateMainPageList();
+        initList(); // 把洛谷原计划保存到脚本
     } else {
-        return [];
+        return {};
     }
 
     function extractData(content) {
@@ -87,15 +86,15 @@ function syncList() {
 }
 
 function updateMainPageList() {
-    //清除官方的任务计划
+    // 清除官方的任务计划
     if (!LuoguSuperTodolist.settings.keepOriginalList) {
         $("h2:contains('智能推荐')").prevAll().remove();
     }
-    //在Luogu官方任务计划后面添加第三方计划
-    var problems = LuoguSuperTodolist.problems;
+    // 在Luogu官方任务计划后面添加第三方计划
+    var problems = GM_getValue('problems')
     $("h2:contains('智能推荐')").before('<h2>任务计划</h2>');
     for (var i in problems) {
-        $("h2:contains('智能推荐')").before('<div class="tasklist-item"><div><a class="colored" style="padding-left: 3px" href="/problemnew/show/'+i+'" target="_blank"><b>'+i+'</b> '+problems[i]+'</a></div></div>');
+        $("h2:contains('智能推荐')").before('<div class="tasklist-item"><div><a class="colored" style="padding-left: 3px" href="/problemnew/show/' + i + '" target="_blank"><b>' + i + '</b> ' + problems[i] + '</a></div></div>');
     }
 }
 
@@ -168,11 +167,10 @@ function addButton() {
 function start() {
     if (nowUrl == 'https://www.luogu.org/') {
         if (runTime == undefined) { // 首次在首页运行脚本，将原任务计划保存
-            // updateRunTime('first'); // 为了方便调试，暂时关掉了
+            updateRunTime('first'); // 为了方便调试，暂时关掉了
             syncList();
-        } else {
-            updateMainPageList(); // 不是首次运行，更新 todolist
         }
+        updateMainPageList(); // 更新主页的 todolist
     } else if (nowUrl.match(/problem/) != null) { // 题目页面运行脚本，更新题目分数、添加按钮
         addButton();
         updateScore();

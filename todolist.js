@@ -85,13 +85,15 @@ function addButton() {
         .append('<p>'
             + '<a href="javascript: ;" '
             + 'id="addToSuperList" '
-            + 'target="_blank" class="am-btn am-btn-sm am-btn-primary">'
+            + 'class="am-btn am-btn-sm am-btn-primary">'
             + '添加至超级任务计划'
             + '</a>'
             + '</p>');
     $("#addToSuperList").click(addToList);
 
-    function addToList() {
+    function addToList(ev) {
+        $("#addToSuperList").attr("class","am-btn am-btn-sm am-btn-danger");
+        $("#addToSuperList").html("从任务计划移除");
     }
 }
 

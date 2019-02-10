@@ -81,46 +81,66 @@ function syncList() {
 
 
 function addButton() {
+    var problemId = nowUrl.match(/[A-Z]+[0-9]+/)[0];
+    var problemTitle = getTitle();
+    // console.log(problemTitle);
+
     if (!isInList()) {
         $(".lg-summary-content")
             .append('<p>'
                 + '<a href="javascript: ;" '
-                + 'id="addToSuperList" '
+                + 'id="update-todolist" '
                 + 'class="am-btn am-btn-sm am-btn-primary">'
                 + '添加至超级任务计划'
                 + '</a>'
                 + '</p>');
-        $("#addToSuperList").click(addToList);
+        $("#update-todolist").click(swapState);
     } else {
         $(".lg-summary-content")
             .append('<p>'
                 + '<a href="javascript: ;" '
-                + 'id="addToSuperList" '
+                + 'id="update-todolist" '
                 + 'class="am-btn am-btn-sm am-btn-danger">'
                 + '从任务计划移除'
                 + '</a>'
                 + '</p>');
-        $("#addToSuperList").click(removeFromList);
+        $("#update-todolist").click(swapState);
+    }
+
+    function getTitle() {
+        // console.log(document.title)
+        return document.title.substr((problemId.length + 1), document.title.length - (problemId.length + 1) - 5)
     }
 
     function isInList() {
-        var nowProblem = nowUrl.match(/[A-Z]+[0-9]+/)[0];
         var nowList = GM_getValue('problems');
-        return nowList[nowProblem] != undefined;
+        return nowList[problemId] != undefined;
     }
 
-    function addToList(ev) {
-        if (isInList()) {
+    function swapState(ev) { // 是不是应该改成检测现在的属性，然后交换属性
+        if (isInList()) { // 已经在任务计划列表，删掉它。变成蓝色按钮
+            removeFromList(problemId, problemTitle);
             $("#addToSuperList").attr("class", "am-btn am-btn-sm am-btn-primary");
             $("#addToSuperList").html("添加至超级任务计划");
-        }
-        else {
+        } else { // 不在任务计划当中，加进去，变成红色按钮
+            addToList(problemId, problemTitle)
             $("#addToSuperList").attr("class", "am-btn am-btn-sm am-btn-danger");
             $("#addToSuperList").html("从任务计划移除");
         }
-        
-        //add current problem to the list
 
+        function addToList(id, title) {
+            var nowList = GM_getValue('problems');
+            nowList[id] = title;
+            console.log(nowList);
+            GM_setValue('problems', nowList);
+        }
+
+        function removeFromList(id, title) {
+            var nowList = GM_getValue('problems');
+            delete nowList[id];
+            console.log(nowList);
+            GM_setValue('problems', nowList)
+        }
     }
 }
 

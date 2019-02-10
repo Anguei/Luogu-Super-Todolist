@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         洛谷超级任务计划（第三方）
 // @namespace    http://tampermonkey.net/
-// @version      1.3
+// @version      1.4
 // @description  洛谷超级任务计划（第三方），不限题目数量
 // @author       Anguei, Legendword
 // @match        https://www.luogu.org/problemnew/show/*
@@ -22,7 +22,7 @@
 // 感谢 @memset0, @Legendword 帮助找 bug
 
 
-var version = '1.3';
+var version = '1.4';
 var originalLimit = 28;
 var nowUrl = window.location.href;
 var LuoguSuperTodolist = {
@@ -246,29 +246,52 @@ function addButton() {
             var nowList = GM_getValue('problems');
             nowList[id] = title;
             GM_setValue('problems', nowList);
+            LuoguSuperTodolist.problems = GM_getValue('problems')
             if (getDictLength(getOriginalList()) < originalLimit) { // 原计划长度足够装下新题目，装进去
-                $.post("/api/user/tasklistAdd", { pid: "P2756" });
-            }
-
-            function getDictLength(dict) {
-                var res = 0;
-                for (var i in dict) res++;
-                return res;
+                $.post("/api/user/tasklistAdd", { pid: id });
             }
         }
 
         function removeFromList(id, title) {
             var nowList = GM_getValue('problems');
             delete nowList[id];
-            GM_setValue('problems', nowList)
-            if (findInDict(id, getOriginalList())) { // 删除的题目在原计划当中，在原计划也删除
-                $.post("/api/user/tasklistRemove", { pid: "P2756" })
+            GM_setValue('problems', nowList);
+            LuoguSuperTodolist.problems = GM_getValue('problems')
+            var originalList = getOriginalList();
+            if (findInDict(id, originalList)) { // 删除的题目在原计划当中，在原计划也删除
+                $.post("/api/user/tasklistRemove", { pid: id })
             }
+            checkOther(); // 看剩余空间够不够再同步几道题进去
 
             function findInDict(target, dict) {
                 for (var i in dict) if (i == target) return true;
                 return false;
             }
+
+            function checkOther() {
+                var diff = originalLimit - (getDictLength(originalList) - 1); // 长度 - 1 是因为刚才删掉了一个
+                console.log(diff);
+                if (diff > 0) {
+                    var cnt = 0;
+                    var arr = new Array();
+                    for (var i in LuoguSuperTodolist.problems) {
+                        if (!findInDict(i, originalList)) { // superList 当中不在 originalList 的题目
+                            arr.push(i);
+                            cnt += 1;
+                            if (cnt == diff) break;
+                        }
+                    }
+                    for (var i = 0; i < arr.length; i++) {
+                        $.post("/api/user/tasklistAdd", { pid: arr[i] });
+                    }
+                }
+            }
+        }
+
+        function getDictLength(dict) {
+            var res = 0;
+            for (var i in dict) res++;
+            return res;
         }
     }
 }
@@ -280,6 +303,7 @@ function start() {
         console.log('更新后首次运行脚本，请耐心等待初始化');
         syncList();
     }
+    LuoguSuperTodolist.problems = GM_getValue('problems')
     if (nowUrl == 'https://www.luogu.org/') {
         updateMainPageList(); // 更新主页的 todolist
     } else if (nowUrl.match(/problem/) != null) { // 题目页面运行脚本，添加按钮

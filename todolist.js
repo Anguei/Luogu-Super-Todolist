@@ -33,15 +33,16 @@ function updateRunTime(s = '') {
     if (s == 'first') {
         runTime = 1;
     } else {
-        runTime++;
+        runTime++; // 好像没啥用
     }
     GM_setValue('runTime', runTime);
 }
 
 
 function syncList() {
+    console.log('syncing');
     var xhr = new XMLHttpRequest();
-    xhr.open('GET', nowUrl, false);
+    xhr.open('GET', 'https://www.luogu.org/', false);
     xhr.send(null);
     if (xhr.status == 200) {
         console.log('get original todo list: 200');
@@ -253,11 +254,12 @@ function addButton() {
 
 
 function start() {
+    if (runTime == undefined) { // 首次运行脚本，将原任务计划保存
+        console.log('首次运行脚本，请耐心等待初始化');
+        updateRunTime('first');
+        syncList();
+    }
     if (nowUrl == 'https://www.luogu.org/') {
-        if (runTime == undefined) { // 首次在首页运行脚本，将原任务计划保存
-            updateRunTime('first'); // 为了方便调试，暂时关掉了
-            syncList();
-        }
         updateMainPageList(); // 更新主页的 todolist
     } else if (nowUrl.match(/problem/) != null) { // 题目页面运行脚本，添加按钮
         addButton();

@@ -22,7 +22,7 @@
 // 感谢 @memset0, @Legendword 帮助找 bug
 
 
-var version = '1.2';
+var version = '1.3';
 var originalLimit = 28;
 var nowUrl = window.location.href;
 var LuoguSuperTodolist = {

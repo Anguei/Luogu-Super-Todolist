@@ -51,6 +51,7 @@ function getOriginalList() {
         return clearData(psid);
 
         function clearData(psid) { // psid: problems' id
+            if (psid[0].match(/智能推荐/) != null) break;
             var res = {}
             for (var i = 1; i < psid.length; i++) { // 从 1 开始循环，因为 split 导致 psid[0] 是垃圾文本串
                 var pId = '', pName = '', j = 0;

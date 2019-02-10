@@ -3,7 +3,7 @@
 // @namespace    http://tampermonkey.net/
 // @version      0.1
 // @description  洛谷第三方任务计划，不限题目数量
-// @author       Anguei
+// @author       Anguei, Legendword
 // @match        https://www.luogu.org/problemnew/show/*
 // @match        https://www.luogu.org/
 // @grant        GM_setValue
@@ -15,6 +15,7 @@
 // 1. 当 todolist 的 size 小于 30 时，顺便加入洛谷官方 todolist
 // 2. 在 res[pId] 中保存加入 todolist 的时间、该题的题目得分（用字典套数组实现）
 // 3. 发布脚本时，不要忘记去掉 updateRuntime('first') 的注释
+// 4. 如果显示分数的开销太高 / 太困难，可以考虑改为「通过 / 尝试过 / 未做」
 
 
 var runTime = GM_getValue('runTime');

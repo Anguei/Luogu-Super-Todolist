@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         洛谷超级任务计划（第三方）
 // @namespace    http://tampermonkey.net/
-// @version      1.4
+// @version      1.5
 // @description  洛谷超级任务计划（第三方），不限题目数量
 // @author       Anguei, Legendword
 // @match        https://www.luogu.org/problemnew/show/*
@@ -22,12 +22,13 @@
 // 感谢 @memset0, @Legendword 帮助找 bug
 
 
-var version = '1.4';
+var version = '1.5';
 var originalLimit = 28;
 var nowUrl = window.location.href;
 var LuoguSuperTodolist = {
     settings: {
-        keepOriginalList: false
+        keepOriginalList: false,
+        debugMode: true
     }
 };
 var myUid = document.cookie.match(/_uid=[0-9]+/)[0].substr(5);
@@ -48,6 +49,9 @@ function getOriginalList() {
 
     function extractData(content) {
         var psid = content.split('" target="_blank"><b>');
+        if (psid[0].indexOf("还没有计划完成的题目<br>")!=-1) {
+            return {};
+        }
         return clearData(psid);
 
         function clearData(psid) { // psid: problems' id
@@ -143,6 +147,10 @@ function updateMainPageList() {
     // 清除官方的任务计划
     if (!LuoguSuperTodolist.settings.keepOriginalList) {
         $("h2:contains('智能推荐')").prevAll().remove();
+        // 当官方计划为空时，删除那句话
+        if ($("h2:contains('智能推荐')").parent().html().indexOf("<h2")>0) {
+            $("h2:contains('智能推荐')").parent().html($("h2:contains('智能推荐')").parent().html().slice($("h2:contains('智能推荐')").parent().html().indexOf("<h2")));
+        }
     }
 
     // 在 Luogu 官方任务计划后面添加第三方计划
@@ -299,7 +307,7 @@ function addButton() {
 
 function start() {
     var lastVersion = GM_getValue('version');
-    if (lastVersion != version) { // 首次运行脚本，将原任务计划保存
+    if ((lastVersion != version)||LuoguSuperTodolist.settings.debugMode) { // 首次运行脚本，将原任务计划保存
         console.log('更新后首次运行脚本，请耐心等待初始化');
         syncList();
     }

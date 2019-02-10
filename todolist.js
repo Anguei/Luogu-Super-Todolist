@@ -26,7 +26,7 @@ var nowUrl = window.location.href;
 var LuoguSuperTodolist = {
     settings: {
         keepOriginalList: false,
-        debugMode: false // 发布前将此设为false
+        debugMode: false // 发布前将此设为 false
     }
 };
 var myUid = document.cookie.match(/_uid=[0-9]+/)[0].substr(5);

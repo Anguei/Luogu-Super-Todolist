@@ -13,9 +13,7 @@
 
 // 可能将要实现的功能：
 // 1. 添加首页的编辑题目按钮
-// 2. 当 todolist 的 size 小于 30 时，新加入 superTodolist 的题目同步加入洛谷官方 todolist
-// 3. 从 superTodolist 删除题目时，若题目也在洛谷官方 todolist 当中，同步删除
-// 4. superTodolist 的导入与导出（以便于与 memset0 的项目配合，以及换电脑之后 superTodolist 的同步）
+// 2. superTodolist 的导入与导出（以便于与 memset0 的项目配合，以及换电脑之后 superTodolist 的同步）
 
 // 感谢 @memset0 提供创意
 // 感谢 @Legendword 协助完成 jQuery 相关代码

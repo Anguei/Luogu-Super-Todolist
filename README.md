@@ -12,7 +12,7 @@
 - [Chrome 插件下载](https://chrome.google.com/webstore/detail/tampermonkey/dhdgffkkebhmkfjojejmpbldmpobfkfo)
 - [Firefox 插件下载](https://addons.mozilla.org/zh-CN/firefox/addon/tampermonkey/)
 
-确保您的浏览器安装 Tampermonkey 插件后，访问[该链接](https://greasyfork.org/zh-CN/scripts/377607-%E6%B4%9B%E8%B0%B7%E8%B6%85%E7%BA%A7%E4%BB%BB%E5%8A%A1%E8%AE%A1%E5%88%92-%E7%AC%AC%E4%B8%89%E6%96%B9)安装脚本。
+确保您的浏览器安装 Tampermonkey 插件后，单击该图片安装脚本：![](https://s2.ax1x.com/2019/02/10/kaCnRU.png)
 
 ## 使用示例
 

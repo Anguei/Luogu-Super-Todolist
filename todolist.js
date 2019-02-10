@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         洛谷超级任务计划（第三方）
 // @namespace    http://tampermonkey.net/
-// @version      0.1
+// @version      1.0
 // @description  洛谷超级任务计划（第三方），不限题目数量
 // @author       Anguei, Legendword
 // @match        https://www.luogu.org/problemnew/show/*
@@ -11,8 +11,15 @@
 // ==/UserScript==
 
 
-// 将要实现的功能：
-// 1. 当 todolist 的 size 小于 30 时，顺便加入洛谷官方 todolist
+// 可能将要实现的功能：
+// 1. 添加首页的编辑题目按钮
+// 2. 当 todolist 的 size 小于 30 时，新加入 superTodolist 的题目同步加入洛谷官方 todolist
+// 3. 从 superTodolist 删除题目时，若题目也在洛谷官方 todolist 当中，同步删除
+// 4. superTodolist 的导入与导出（以便于与 memset0 的项目配合，以及换电脑之后 superTodolist 的同步）
+
+// 感谢 @memset0 提供创意
+// 感谢 @Legendword 协助完成 jQuery 相关代码
+// 感谢 @memset0, @Legendword 帮助找 bug
 
 
 var runTime = GM_getValue('runTime');
@@ -140,13 +147,14 @@ function updateMainPageList() {
     if (!LuoguSuperTodolist.settings.keepOriginalList) {
         $("h2:contains('智能推荐')").prevAll().remove();
     }
-    // 在Luogu官方任务计划后面添加第三方计划
+
+    // 在 Luogu 官方任务计划后面添加第三方计划
     var problems = GM_getValue('problems')
     $("h2:contains('智能推荐')").before('<h2>任务计划</h2>');
     for (var i in problems) {
         var state = getState(i);
-        color = { 'Y': 'green', 'N': 'black', '?': 'orange' };
-        text = { 'Y': '<i class="am-icon-check"></i>', 'N': '<i class="am-icon-minus"></i>', '?': '?' };
+        var color = { 'Y': 'green', 'N': 'black', '?': 'orange' };
+        var content = { 'Y': '<i class="am-icon-check"></i>', 'N': '<i class="am-icon-minus"></i>', '?': '？' };
         $("h2:contains('智能推荐')").before(
             '<div class="tasklist-item" data-pid="'
             + i
@@ -156,16 +164,15 @@ function updateMainPageList() {
             + i
             + '" target="_blank"><strong class="lg-fg-'
             + color[state]
-            + '">' + text[state]
-            + '</strong></a><a class="colored" style="padding-left: 3px" href="/problemnew/show/'
+            + '">' + content[state]
+            + '</strong></a>'
+            + '<a class="colored" style="padding-left: 3px" href="/problemnew/show/'
             + i
             + '" target="_blank"><b>'
             + i
             + '</b> '
             + problems[i]
-            + '</a></div><div style="margin:10px 0;display:none;" class="tasklist-edit"><button class="am-btn am-btn-sm am-btn-success" data-pid="'
-            + i
-            + '">完成任务</button><hr></div></div>'
+            + '</a></div></div>'
         );
     }
 

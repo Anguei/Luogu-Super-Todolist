@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         洛谷超级任务计划（第三方）
-// @namespace    https://github.com/Anguei/Luogu-Super-Todolist
-// @version      1.0
+// @namespace    http://tampermonkey.net/
+// @version      1.1
 // @description  洛谷超级任务计划（第三方），不限题目数量
 // @author       Anguei, Legendword
 // @match        https://www.luogu.org/problemnew/show/*
@@ -29,11 +29,9 @@ var LuoguSuperTodolist = {
         keepOriginalList: false
     }
 };
-// <a href="/recordnew/lists?uid=53062&pid=P3885" target="_blank">
-var myUid = nowUrl == 'https://www.luogu.org/'
-    ? document.getElementsByClassName('lg-fg-purple lg-bold')[0].attributes['href'].value.match(/[0-9]+/)[0]
-    : document.getElementsByTagName('a')[0].attributes['href'].value.match(/[0-9]+/)[0]; // 获取当前登录账号的 uid（洛谷前端改版后）
-console.log(myUid);
+var myUid = document.cookie.substr(5);
+console.log(myUid)
+console.log('如果上面获取到的 uid 不正确，请反馈作者，谢谢')
 
 
 function updateRunTime(s = '') {

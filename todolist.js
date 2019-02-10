@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         洛谷超级任务计划（第三方）
 // @namespace    http://tampermonkey.net/
-// @version      1.2
+// @version      1.3
 // @description  洛谷超级任务计划（第三方），不限题目数量
 // @author       Anguei, Legendword
 // @match        https://www.luogu.org/problemnew/show/*
@@ -22,7 +22,8 @@
 // 感谢 @memset0, @Legendword 帮助找 bug
 
 
-var version = '1.2'
+var version = '1.2';
+var originalLimit = 28;
 var nowUrl = window.location.href;
 var LuoguSuperTodolist = {
     settings: {
@@ -34,25 +35,20 @@ console.log(myUid)
 console.log('如果上面获取到的 uid 不正确，请反馈作者，谢谢')
 
 
-function syncList() {
-    console.log('syncing');
+function getOriginalList() {
     var xhr = new XMLHttpRequest();
     xhr.open('GET', 'https://www.luogu.org/', false);
     xhr.send(null);
     if (xhr.status == 200) {
         console.log('get original todo list: 200');
-        var problems = extractData(xhr.responseText);
-        LuoguSuperTodolist.problems = problems;
-        initList(); // 把洛谷原计划保存到脚本
+        return extractData(xhr.responseText);
     } else {
         return {};
     }
 
     function extractData(content) {
         var psid = content.split('" target="_blank"><b>');
-        var problems = clearData(psid);
-        // console.log(problems);
-        return problems;
+        return clearData(psid);
 
         function clearData(psid) { // psid: problems' id
             var res = {}
@@ -74,6 +70,13 @@ function syncList() {
             return res;
         }
     }
+}
+
+
+function syncList() {
+    console.log('syncing');
+    LuoguSuperTodolist.problems = getOriginalList();
+    initList(); // 把洛谷原计划保存到脚本
 
     function initList() {
         var old = GM_getValue('problems');
@@ -243,12 +246,29 @@ function addButton() {
             var nowList = GM_getValue('problems');
             nowList[id] = title;
             GM_setValue('problems', nowList);
+            if (getDictLength(getOriginalList()) < originalLimit) { // 原计划长度足够装下新题目，装进去
+                $.post("/api/user/tasklistAdd", { pid: "P2756" });
+            }
+
+            function getDictLength(dict) {
+                var res = 0;
+                for (var i in dict) res++;
+                return res;
+            }
         }
 
         function removeFromList(id, title) {
             var nowList = GM_getValue('problems');
             delete nowList[id];
             GM_setValue('problems', nowList)
+            if (findInDict(id, getOriginalList())) { // 删除的题目在原计划当中，在原计划也删除
+                $.post("/api/user/tasklistRemove", { pid: "P2756" })
+            }
+
+            function findInDict(target, dict) {
+                for (var i in dict) if (i == target) return true;
+                return false;
+            }
         }
     }
 }

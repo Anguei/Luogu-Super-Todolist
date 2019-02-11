@@ -191,7 +191,7 @@ function updateMainPageList() {
         // 导出列表
         var listString = generateExportedList();
         $("h2:contains('任务计划')").after(
-            "<div id='LuoguSuperTodolist-exportRes'>将以下文本复制到todo.list文件，即可用于memset0的Todolist"
+            "<div id='LuoguSuperTodolist-exportRes'>将以下文本复制到 todo.list 文件，即可用于 memset0 的 Todolist"
             + "<div class='am-form-group am-form'><textarea>"
             + listString
             + "</textarea></div>"

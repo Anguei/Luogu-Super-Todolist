@@ -184,11 +184,11 @@ function updateMainPageList() {
             do {
                 $("#LuoguSuperTodolist-export").html("导入 / 导出");
                 $("#LuoguSuperTodolist-exportRes").remove();
-            } while (!importProblem()); // 直到成功导入
+            } while (true/*!importProblem()*/); // 直到成功导入
         } else { // 响应「导入 / 导出」按钮
             var listString = generateExportedList();
             $("h2:contains('任务计划')").after(
-                "<div id='LuoguSuperTodolist-exportRes'>编辑下方文本进行导入 / 导出操作。</br>格式：[题号] + '#'(井号) + [题目标题]，一行一题。</br>拖动右下角可以改变编辑框大小。"
+                "<div id='LuoguSuperTodolist-exportRes'>编辑下方文本进行导入 / 导出操作。</br>格式：[题号] + '#'(井号) + [题目标题]，一行一题。</br>拖动右下角可以改变编辑框大小。</br><b>导入功能尚未完成</b>"
                 + "<div class='am-form-group am-form'><textarea id='edit-problem'>"
                 + listString
                 + "</textarea></div>"
@@ -199,8 +199,9 @@ function updateMainPageList() {
 
         LuoguSuperTodolist.exportOpen ^= 1; // 使用异或运算切换状态，简便快捷
 
-        function importProblem() {
-            var input = document.getElementById('edit-problem').value.split('\n'); // 此行出现异常
+        function importProblem() { // 尚不支持检测题号是否合法
+            var input = document.getElementById('edit-problem') // .value.split('\n'); // 此行出现异常
+            console.log(input);
             var problems = LuoguSuperTodolist.problems;
             for (var i = 0; i < input.length; i++) {
                 if (countSharp(input[i]) != 1) {

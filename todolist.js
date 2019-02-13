@@ -47,7 +47,7 @@ function getOriginalList() {
 
     function extractData(content) {
         var psid = content.split('" target="_blank"><b>');
-        if (psid[0].indexOf("还没有计划完成的题目<br>")!=-1) {
+        if (psid[0].indexOf("还没有计划完成的题目<br>") != -1) {
             return {};
         }
         return clearData(psid);
@@ -146,14 +146,14 @@ function updateMainPageList() {
     if (!LuoguSuperTodolist.settings.keepOriginalList) {
         $("h2:contains('智能推荐')").prevAll().remove();
         // 当官方计划为空时，删除那句话
-        if ($("h2:contains('智能推荐')").parent().html().indexOf("<h2")>0) {
+        if ($("h2:contains('智能推荐')").parent().html().indexOf("<h2") > 0) {
             $("h2:contains('智能推荐')").parent().html($("h2:contains('智能推荐')").parent().html().slice($("h2:contains('智能推荐')").parent().html().indexOf("<h2")));
         }
     }
 
     // 在 Luogu 官方任务计划后面添加第三方计划
     var problems = GM_getValue('problems')
-    $("h2:contains('智能推荐')").before('<h2>任务计划<button class="am-btn am-btn-sm am-btn-primary lg-right" id="LuoguSuperTodolist-export">导出</button></h2>');
+    $("h2:contains('智能推荐')").before('<h2>任务计划<button class="am-btn am-btn-sm am-btn-primary lg-right" id="LuoguSuperTodolist-export">导入 / 导出</button></h2>');
     for (var i in problems) {
         var state = getState(i);
         var color = { 'Y': 'green', 'N': 'black', '?': 'orange' };
@@ -178,34 +178,57 @@ function updateMainPageList() {
             + '</a></div></div>'
         );
     }
-    $("#LuoguSuperTodolist-export").click(function(){
-        if (LuoguSuperTodolist.exportOpen) {
-            $("#LuoguSuperTodolist-export").html("导出");
-            $("#LuoguSuperTodolist-exportRes").remove();
-            LuoguSuperTodolist.exportOpen = false;
-            return;
+
+    $("#LuoguSuperTodolist-export").click(function () {
+        if (LuoguSuperTodolist.exportOpen) { // 响应「完成」按钮
+            do {
+                $("#LuoguSuperTodolist-export").html("导入 / 导出");
+                $("#LuoguSuperTodolist-exportRes").remove();
+            } while (!importProblem()); // 直到成功导入
+        } else { // 响应「导入 / 导出」按钮
+            var listString = generateExportedList();
+            $("h2:contains('任务计划')").after(
+                "<div id='LuoguSuperTodolist-exportRes'>编辑下方文本进行导入 / 导出操作。</br>格式：[题号] + '#'(井号) + [题目标题]，一行一题。</br>拖动右下角可以改变编辑框大小。"
+                + "<div class='am-form-group am-form'><textarea id='edit-problem'>"
+                + listString
+                + "</textarea></div>"
+            );
+            console.log(listString);
+            $("#LuoguSuperTodolist-export").html("完成");
         }
-        else {
-            LuoguSuperTodolist.exportOpen = true;
+
+        LuoguSuperTodolist.exportOpen ^= 1; // 使用异或运算切换状态，简便快捷
+
+        function importProblem() {
+            var input = document.getElementById('edit-problem').value.split('\n'); // 此行出现异常
+            var problems = LuoguSuperTodolist.problems;
+            for (var i = 0; i < input.length; i++) {
+                if (countSharp(input[i]) != 1) {
+                    alert('输入数据不合法！')
+                    return false;
+                }
+                input[i] = input[i].split('#');
+                if (problems[input[i][0]] == undefined) {
+                    problems[input[i][0]] = input[i][1];
+                }
+            }
+            LuoguSuperTodolist.problems = problems;
+            updateMainPageList(); // 导入成功后需要更新显示            
+
+            function countSharp(s) { // 计算字符串中 # 号数量，检查格式
+                var count = 0;
+                for (var i = 0; i < s.length; i++) count += (s[i] == '#');
+                return count;
+            }
         }
-        // 导出列表
-        var listString = generateExportedList();
-        $("h2:contains('任务计划')").after(
-            "<div id='LuoguSuperTodolist-exportRes'>将以下文本复制到 todo.list 文件，即可用于 memset0 的 Todolist"
-            + "<div class='am-form-group am-form'><textarea>"
-            + listString
-            + "</textarea></div>"
-        );
-        console.log(listString);
-        $("#LuoguSuperTodolist-export").html("完成");
 
         function generateExportedList() {
             var problems = LuoguSuperTodolist.problems;
-            var ex = "";
+            var res = "";
             for (var c in problems) {
-                ex += "\n"+c+" # "+problems[c];
+                res += "\n" + c + " # " + problems[c];
             }
-            return ex;
+            return res;
         }
     });
 
@@ -335,7 +358,7 @@ function addButton() {
 
 function start() {
     var lastVersion = GM_getValue('version');
-    if ((lastVersion != version)||LuoguSuperTodolist.settings.debugMode) { // 首次运行脚本，将原任务计划保存
+    if ((lastVersion != version) || LuoguSuperTodolist.settings.debugMode) { // 首次运行脚本，将原任务计划保存
         console.log('更新后首次运行脚本，请耐心等待初始化');
         syncList();
     }

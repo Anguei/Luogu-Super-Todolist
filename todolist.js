@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         洛谷超级任务计划（第三方）
 // @namespace    http://tampermonkey.net/
-// @version      1.6
+// @version      1.7
 // @description  洛谷超级任务计划（第三方），不限题目数量
 // @author       Anguei, Legendword
 // @match        https://www.luogu.org/problemnew/show/*
@@ -14,13 +14,14 @@
 // 可能将要实现的功能：
 // 1. 添加首页的编辑题目按钮
 // 2. superTodolist 的导入与导出（以便于与 memset0 的项目配合，以及换电脑之后 superTodolist 的同步）
+// 3. 添加异常处理，如 get 请求没有 200
 
 // 感谢 @memset0 提供创意
 // 感谢 @Legendword 协助完成 jQuery 相关代码
 // 感谢 @memset0, @Legendword 帮助找 bug
 
 
-var version = '1.6';
+var version = '1.7  ';
 var originalLimit = 28;
 var nowUrl = window.location.href;
 var LuoguSuperTodolist = {
@@ -181,14 +182,16 @@ function updateMainPageList() {
 
     $("#LuoguSuperTodolist-export").click(function () {
         if (LuoguSuperTodolist.exportOpen) { // 响应「完成」按钮
-            do {
-                $("#LuoguSuperTodolist-export").html("导入 / 导出");
-                $("#LuoguSuperTodolist-exportRes").remove();
-            } while (true/*!importProblem()*/); // 直到成功导入
+            /*while (!importProblem()) {
+                $("#edit-problem")[0].value = generateExportedList(); // 恢复原文本串
+            } // 直到成功导入*/
+            importProblem();
+            $("#LuoguSuperTodolist-export").html("导入 / 导出");
+            $("#LuoguSuperTodolist-exportRes").remove();
         } else { // 响应「导入 / 导出」按钮
             var listString = generateExportedList();
             $("h2:contains('任务计划')").after(
-                "<div id='LuoguSuperTodolist-exportRes'>编辑下方文本进行导入 / 导出操作。</br>格式：[题号] + '#'(井号) + [题目标题]，一行一题。</br>拖动右下角可以改变编辑框大小。</br><b>导入功能尚未完成</b>"
+                "<div id='LuoguSuperTodolist-exportRes'>编辑下方文本进行导入 / 导出操作。</br>格式：[题号] + '#'(井号) + [题目标题]，一行一题。</br>拖动右下角可以改变编辑框大小。"
                 + "<div class='am-form-group am-form'><textarea id='edit-problem'>"
                 + listString
                 + "</textarea></div>"
@@ -200,26 +203,38 @@ function updateMainPageList() {
         LuoguSuperTodolist.exportOpen ^= 1; // 使用异或运算切换状态，简便快捷
 
         function importProblem() { // 尚不支持检测题号是否合法
-            var input = document.getElementById('edit-problem') // .value.split('\n'); // 此行出现异常
+            var input = $("#edit-problem").val()
+            input = input.split('\n'); // jQuery 自带 split 有问题，必须用 string 的是 split
             console.log(input);
             var problems = LuoguSuperTodolist.problems;
             for (var i = 0; i < input.length; i++) {
-                if (countSharp(input[i]) != 1) {
+                if (!checkString(input[i])) {
                     alert('输入数据不合法！')
                     return false;
                 }
-                input[i] = input[i].split('#');
+                input[i] = input[i].split(' # '); // 注意这里不能是单纯的井号
                 if (problems[input[i][0]] == undefined) {
                     problems[input[i][0]] = input[i][1];
+                    console.log(problems[input[i][0]]);
                 }
             }
             LuoguSuperTodolist.problems = problems;
+            console.log(LuoguSuperTodolist.problems);
+            GM_setValue('problems', LuoguSuperTodolist.problems);
             updateMainPageList(); // 导入成功后需要更新显示            
 
-            function countSharp(s) { // 计算字符串中 # 号数量，检查格式
-                var count = 0;
-                for (var i = 0; i < s.length; i++) count += (s[i] == '#');
-                return count;
+            function checkString(s) { // 计算字符串中 # 号数量，检查格式
+                var pos = -1;
+                for (var i = 0; i < s.length; i++) {
+                    if (s[i] == '#') {
+                        if (pos == -1) {
+                            pos = i;
+                        } else {
+                            pos = -2;
+                        }
+                    }
+                }
+                return pos > 0 && s[pos - 1] == ' ' && s[pos + 1] == ' ';
             }
         }
 

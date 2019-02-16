@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         洛谷超级任务计划（第三方）
 // @namespace    http://tampermonkey.net/
-// @version      1.7
+// @version      1.8
 // @description  洛谷超级任务计划（第三方），不限题目数量
 // @author       Anguei, Legendword
 // @match        https://www.luogu.org/problemnew/show/*
@@ -12,16 +12,14 @@
 
 
 // 可能将要实现的功能：
-// 1. 添加首页的编辑题目按钮
-// 2. superTodolist 的导入与导出（以便于与 memset0 的项目配合，以及换电脑之后 superTodolist 的同步）
-// 3. 添加异常处理，如 get 请求没有 200
+// 1. 添加异常处理，如 get 请求没有 200
 
 // 感谢 @memset0 提供创意
 // 感谢 @Legendword 协助完成 jQuery 相关代码
 // 感谢 @memset0, @Legendword 帮助找 bug
 
 
-var version = '1.7  ';
+var version = '1.8';
 var originalLimit = 28;
 var nowUrl = window.location.href;
 var LuoguSuperTodolist = {
@@ -154,7 +152,7 @@ function updateMainPageList() {
 
     // 在 Luogu 官方任务计划后面添加第三方计划
     var problems = GM_getValue('problems')
-    $("h2:contains('智能推荐')").before('<h2>任务计划<button class="am-btn am-btn-sm am-btn-primary lg-right" id="LuoguSuperTodolist-export">导入 / 导出</button></h2>');
+    $("h2:contains('智能推荐')").before('<h2>任务计划<button class="am-btn am-btn-sm am-btn-primary lg-right" id="LuoguSuperTodolist-export">编辑</button></h2>');
     for (var i in problems) {
         var state = getState(i);
         var color = { 'Y': 'green', 'N': 'black', '?': 'orange' };
@@ -186,12 +184,12 @@ function updateMainPageList() {
                 $("#edit-problem")[0].value = generateExportedList(); // 恢复原文本串
             } // 直到成功导入*/
             importProblem();
-            $("#LuoguSuperTodolist-export").html("导入 / 导出");
+            $("#LuoguSuperTodolist-export").html("编辑");
             $("#LuoguSuperTodolist-exportRes").remove();
         } else { // 响应「导入 / 导出」按钮
             var listString = generateExportedList();
             $("h2:contains('任务计划')").after(
-                "<div id='LuoguSuperTodolist-exportRes'>编辑下方文本进行导入 / 导出操作。</br>格式：[题号] + '#'(井号) + [题目标题]，一行一题。</br>拖动右下角可以改变编辑框大小。"
+                "<div id='LuoguSuperTodolist-exportRes'>编辑下方文本进行编辑操作。</br>格式：[题号] + '#'(井号) + [题目标题]，一行一题。</br>拖动右下角可以改变编辑框大小。"
                 + "<div class='am-form-group am-form'><textarea id='edit-problem'>"
                 + listString
                 + "</textarea></div>"
@@ -206,7 +204,8 @@ function updateMainPageList() {
             var input = $("#edit-problem").val()
             input = input.split('\n'); // jQuery 自带 split 有问题，必须用 string 的是 split
             console.log(input);
-            var problems = LuoguSuperTodolist.problems;
+            // var problems = LuoguSuperTodolist.problems;
+            var problems = {}; // for oier sp
             for (var i = 0; i < input.length; i++) {
                 if (!checkString(input[i])) {
                     alert('输入数据不合法！')
@@ -373,8 +372,12 @@ function addButton() {
 
 
 function start() {
-    var lastVersion = GM_getValue('version');
-    if ((lastVersion != version) || LuoguSuperTodolist.settings.debugMode) { // 首次运行脚本，将原任务计划保存
+    var lastUse = GM_getValue('lastUse');
+    var date = Date();
+    date = date.split(' ');
+    date = date[0] + date[1];
+    GM_setValue('lastUse', date);
+    if (lastUse == undefined || lastUse != date || LuoguSuperTodolist.settings.debugMode) { // 首次运行脚本，将原任务计划保存
         console.log('更新后首次运行脚本，请耐心等待初始化');
         syncList();
     }
@@ -384,7 +387,6 @@ function start() {
     } else if (nowUrl.match(/problem/) != null) { // 题目页面运行脚本，添加按钮
         addButton();
     }
-    GM_setValue('version', version);
 }
 
 

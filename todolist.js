@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         洛谷超级任务计划（第三方）
 // @namespace    http://tampermonkey.net/
-// @version      1.8
+// @version      1.9
 // @description  洛谷超级任务计划（第三方），不限题目数量
 // @author       Anguei, Legendword
 // @match        https://www.luogu.org/problemnew/show/*
@@ -19,7 +19,6 @@
 // 感谢 @memset0, @Legendword 帮助找 bug
 
 
-var version = '1.8';
 var originalLimit = 28;
 var nowUrl = window.location.href;
 var LuoguSuperTodolist = {
@@ -270,7 +269,7 @@ function addButton() {
     $('#remove-tasklist').remove();
     $('#add-tasklist').remove(); // 移除旧的按钮
 
-    var problemId = nowUrl.match(/[A-Z]+[0-9]+/)[0];
+    var problemId = nowUrl.match(/[A-Z]+[0-9]+[A-Z]/)[0];
     var problemTitle = getTitle();
 
     if (!isInList()) {

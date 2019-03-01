@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         洛谷超级任务计划（第三方）
 // @namespace    http://tampermonkey.net/
-// @version      1.10
+// @version      1.11
 // @description  洛谷超级任务计划（第三方），不限题目数量
 // @author       Anguei, Legendword
 // @match        https://www.luogu.org/problemnew/show/*
@@ -13,6 +13,8 @@
 
 // 可能将要实现的功能：
 // 1. 添加异常处理，如 get 请求没有 200
+// 2. 显示当前任务计划总数
+// 3. 在只知道题号的情况下进行导入
 
 // 感谢 @memset0 提供创意
 // 感谢 @Legendword 协助完成 jQuery 相关代码
@@ -134,6 +136,13 @@ function getAc(uid) { // 从原来代码复制过来的
 }
 
 
+function getDictLength(dict) {
+    var res = 0;
+    for (var i in dict) res++;
+    return res;
+}
+
+
 function updateMainPageList() {
     var tmp = getAc(myUid);
     var myAc = tmp[0], myAttempt = tmp[1];
@@ -151,7 +160,7 @@ function updateMainPageList() {
 
     // 在 Luogu 官方任务计划后面添加第三方计划
     var problems = GM_getValue('problems')
-    $("h2:contains('智能推荐')").before('<h2>任务计划<button class="am-btn am-btn-sm am-btn-primary lg-right" id="LuoguSuperTodolist-export">编辑</button></h2>');
+    $("h2:contains('智能推荐')").before('<h2>任务计划 (' + getDictLength(problems) + ' 题)' + '<button class="am-btn am-btn-sm am-btn-primary lg-right" id="LuoguSuperTodolist-export">编辑</button></h2>');
     for (var i in problems) {
         var state = getState(i);
         var color = { 'Y': 'green', 'N': 'black', '?': 'orange' };
@@ -363,12 +372,6 @@ function addButton() {
                     }
                 }
             }
-        }
-
-        function getDictLength(dict) {
-            var res = 0;
-            for (var i in dict) res++;
-            return res;
         }
     }
 }

@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         洛谷超级任务计划（第三方）
 // @namespace    http://tampermonkey.net/
-// @version      1.11
+// @version      1.12
 // @description  洛谷超级任务计划（第三方），不限题目数量
 // @author       Anguei, Legendword
 // @match        https://www.luogu.org/problemnew/show/*

@@ -29,9 +29,13 @@ var LuoguSuperTodolist = {
         debugMode: false // 发布前将此设为 false
     }
 };
-var myUid = document.cookie.match(/_uid=[0-9]+/)[0].substr(5);
-console.log(myUid)
-console.log('如果上面获取到的 uid 不正确，请反馈作者，谢谢')
+// var myUid = document.cookie.match(/_uid=[0-9]+/)[0].substr(5);
+// console.log(myUid)
+// console.log('如果上面获取到的 uid 不正确，请反馈作者，谢谢')
+var myUid = GM_getValue("myUid");
+if (myUid == undefined || myUid == 'undefined')
+    myUid = prompt("任务计划脚本更新，请正确输入您的 uid（数字）以保障插件正常运行");
+GM_setValue("myUid", myUid);
 
 
 function getOriginalList() {
